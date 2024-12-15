@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random String Generator</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 600px;
+        }
+        .input-field {
+            margin: 10px 0;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        .row a {
+            margin-left: 10px;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            margin-bottom: 20px;
+        }
+        .btn, .btn-small {
+            margin: 5px 0;
+        }
+        .btn {
+            width: 100%;
+        }
+        .string-text {
+            flex-grow: 1;
+            word-break: break-all;
+            margin-right: 15px;
+            font-size: 1.1em;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        const consonants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z', '-'];
+
+        function getRandomChar(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateRandomString(length, startWithVowel = Math.random() < 0.5) {
+            let result = '';
+            let isVowel = startWithVowel;
+            
+            for (let i = 0; i < length; i++) {
+                // Avoid hyphen at the start or end of the string
+                if (i === 0 || i === length - 1) {
+                    if (isVowel) {
+                        result += getRandomChar(vowels);
+                    } else {
+                        // Use only letters for first and last character
+                        result += getRandomChar(consonants.filter(c => c !== '-'));
+                    }
+                } else {
+                    if (isVowel) {
+                        result += getRandomChar(vowels);
+                    } else {
+                        // Avoid consecutive hyphens
+                        if (result[result.length - 1] === '-') {
+                            result += getRandomChar(consonants.filter(c => c !== '-'));
+                        } else {
+                            result += getRandomChar(consonants);
+                        }
+                    }
+                }
+                isVowel = !isVowel;
+            }
+            return result;
+        }
+
+        function addRandomStrings() {
+            const count = parseInt(document.getElementById('count').value, 10) || 1;
+            const length = parseInt(document.getElementById('length').value, 10) || 5;
+            const container = document.getElementById('stringsContainer');
+            container.innerHTML = ''; // Clear previous strings
+
+            for (let i = 0; i < count; i++) {
+                const startWithVowel = Math.random() < 0.5;
+                const randomString = generateRandomString(length, startWithVowel);
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                const span = document.createElement('span');
+                span.className = 'string-text';
+                span.textContent = randomString;
+
+                const link = document.createElement('a');
+                link.className = 'waves-effect waves-light btn-small';
+                link.href = `https://www.google.com/search?q=${encodeURIComponent(randomString)}`;
+                link.target = '_blank';
+                link.innerHTML = '<i class="material-icons left">search</i>Search';
+
+                row.appendChild(span);
+                row.appendChild(link);
+                container.appendChild(row);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            M.updateTextFields();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <div class="input-field">
+                <input type="number" id="count" value="5" min="1">
+                <label for="count">Number of Strings</label>
+            </div>
+
+            <div class="input-field">
+                <input type="number" id="length" value="5" min="1">
+                <label for="length">Length of Strings</label>
+            </div>
+
+            <a class="waves-effect waves-light btn" onclick="addRandomStrings()">
+                <i class="material-icons left">autorenew</i>Generate
+            </a>
+        </div>
+        <div id="stringsContainer"></div>
+    </div>
+</body>
+</html>
